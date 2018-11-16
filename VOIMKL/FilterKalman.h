@@ -36,7 +36,7 @@ public:
 	void Predict(CMeasurements firstMeasure, CMeasurements secondMeasure, mat &, colvec &);
 	colvec Predict(CBaseTraceHypo Trace, CMeasurements Measure, double);
 
-	void UpdateMeasure(CBaseTraceHypo, CBaseTraceHypo);
+	void UpdateMeasure(CBaseTraceHypo, CMeasurements);
 	void UpdatePredict(CBaseTraceHypo, double);
 
 	void Prediction(double);

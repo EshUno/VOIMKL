@@ -9,11 +9,8 @@ private:
 	int Nmiss;
 	mat R=zeros<mat>(M,M); //double
 	bool reservedForUpdate;
-	//dcolvec z = zeros(3); добавить геттерe
-
-
+	dcolvec z = zeros(M);
 public:
-	dcolvec z = zeros(3);
 	CMeasurements(CVector coordinates, double vr, double time);
 	CMeasurements::CMeasurements(CResultOfScan &newres);
 	~CMeasurements();
@@ -21,7 +18,10 @@ public:
 	const int GetNmiss();
 	double FromDekartToAzimut();
 	const mat &GetR();
+	mat &SetR();
 	void SetReservedForUpdate();
 	const bool GetReservedForUpdate();
+	const dcolvec &Getz();
+	dcolvec &Setz();
 };
 #endif Measurements_H

@@ -61,7 +61,7 @@ void CKalmanFilter::Predict(CMeasurements firstMeasure, CMeasurements secondMeas
 	mat R_Meas = firstMeasure.GetR() + secondMeasure.GetR();
 	S_VOI = R_Meas + H * P * H.t();
 //	v = firstMeasure.Coordinates - secondMeasure.Coordinates;
-	v_VOI = firstMeasure.z - secondMeasure.z;
+	v_VOI = firstMeasure.Setz() - secondMeasure.Setz();
 }
 
 colvec CKalmanFilter::Predict(CBaseTraceHypo TraceOrHypo, CMeasurements Measure, double dt)
@@ -70,13 +70,13 @@ colvec CKalmanFilter::Predict(CBaseTraceHypo TraceOrHypo, CMeasurements Measure,
 	update_F(dt);
 	update_U(dt);
 
-	x_pred = F * TraceOrHypo.GetState_X();
+	x_pred = F * TraceOrHypo.SetState_X();
 	//x_pred = F * x_0;
 	z_pred = H * x_pred;
 	//v = Measure.Coordinates - z_pred;
 
 
-	P = F * TraceOrHypo.Get_P * F.t() + U * Q * U.t();
+	P = F * TraceOrHypo.SetP() * F.t() + U * Q * U.t();
 	S = R + H * P * H.t();
 
 	return v;
@@ -108,7 +108,7 @@ void CKalmanFilter::Update()
 
 void CKalmanFilter::UpdateMeasure(CBaseTraceHypo TraceOrHypo, CMeasurements measurement)
 {
-	this->v = measurement.z - this->x_pred;
+	v = measurement.Getz() - x_pred;
 	W = P * H.t() * S.t();
 	P = P - W * S * W.i();
 	x_pred = x_pred + W * v;
