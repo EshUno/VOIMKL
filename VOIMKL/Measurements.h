@@ -9,7 +9,11 @@ private:
 	int Nmiss;
 	mat R=zeros<mat>(M,M); //double
 	bool reservedForUpdate;
+	//dcolvec z = zeros(3); добавить геттерe
+
+
 public:
+	dcolvec z = zeros(3);
 	CMeasurements(CVector coordinates, double vr, double time);
 	CMeasurements::CMeasurements(CResultOfScan &newres);
 	~CMeasurements();
