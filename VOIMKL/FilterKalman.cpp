@@ -61,6 +61,7 @@ void CKalmanFilter::Predict(CMeasurements firstMeasure, CMeasurements secondMeas
 	mat R_Meas = firstMeasure.GetR() + secondMeasure.GetR();
 	S = R_Meas + H * P * H.t();
 //	v = firstMeasure.Coordinates - secondMeasure.Coordinates;
+	this->v = firstMeasure.measurement - secondMeasure.measurement;
 }
 
 void CKalmanFilter::Predict(CBaseTraceHypo Trace, CMeasurements Measure, double dt)

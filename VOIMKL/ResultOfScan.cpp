@@ -9,5 +9,10 @@ CResultOfScan::CResultOfScan(CVector coordinates, double vr, double time)
 	detectionTime = time;
 }
 
+CResultOfScan::CResultOfScan(dcolvec coordinates, double vr, double time)
+{
+	this->
+}
+
 CResultOfScan::~CResultOfScan()
 {}
