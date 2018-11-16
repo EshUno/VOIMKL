@@ -112,6 +112,7 @@ void CKalmanFilter::UpdateMeasure(CBaseTraceHypo Trace)
 	Trace.NullNmiss();
 }
 
+//изменить функцию
 void CKalmanFilter::UpdatePredict(CBaseTraceHypo Trace, double dt)
 {
 	update_F(dt);
