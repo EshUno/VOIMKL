@@ -55,7 +55,7 @@ void CKalmanFilter::Prediction(double dt)
 	//this->P = F * P_0 * F.transpose() + U * Q * U.transpose();
 }
 
-void CKalmanFilter::Predict(CMeasurements firstMeasure, CMeasurements secondMeasure, mat & S_VOI, colvec & v_VOI)
+void CKalmanFilter::Predict(CMeasurements &firstMeasure, CMeasurements &secondMeasure, mat & S_VOI, colvec & v_VOI)
 {
 	P = F * P_Const * F.t() + U * Q * U.t();
 	mat R_Meas = firstMeasure.GetR() + secondMeasure.GetR();
@@ -64,7 +64,7 @@ void CKalmanFilter::Predict(CMeasurements firstMeasure, CMeasurements secondMeas
 	v_VOI = firstMeasure.Setz() - secondMeasure.Setz();
 }
 
-colvec CKalmanFilter::Predict(CBaseTraceHypo TraceOrHypo, CMeasurements Measure, double dt)
+colvec CKalmanFilter::Predict(CBaseTraceHypo &TraceOrHypo, CMeasurements &Measure, double dt)
 {
 	this->Dt = dt;
 	update_F(dt);
@@ -106,7 +106,7 @@ void CKalmanFilter::Update()
 
 }
 
-void CKalmanFilter::UpdateMeasure(CBaseTraceHypo TraceOrHypo, CMeasurements measurement)
+void CKalmanFilter::UpdateMeasure(CBaseTraceHypo &TraceOrHypo, CMeasurements &measurement)
 {
 	v = measurement.Getz() - x_pred;
 	W = P * H.t() * S.t();
@@ -117,7 +117,7 @@ void CKalmanFilter::UpdateMeasure(CBaseTraceHypo TraceOrHypo, CMeasurements meas
 }
 
 //изменить функцию
-void CKalmanFilter::UpdatePredict(CBaseTraceHypo TraceOrHypo, double dt)
+void CKalmanFilter::UpdatePredict(CBaseTraceHypo &TraceOrHypo, double dt)
 {
 	update_F(dt);
 	update_U(dt);
@@ -247,5 +247,8 @@ void CKalmanFilter::setDt(double Dt)
 	this->Dt = Dt;
 }
 
-
+mat &CKalmanFilter::GetS()
+{
+	return this->S;
+}
 

@@ -79,6 +79,7 @@ CHypo::CHypo(CMeasurements &newM) : CBaseTraceHypo()
 		}
 	}
 	this->Q = constQ;
+	this->lastTime = 0;
 }
 
 CHypo::~CHypo()
@@ -105,4 +106,14 @@ CTrace CHypo::HypoToTrace()
 {
 	CTrace resTrace(std::move(*this));
 	return resTrace;
+}
+
+double CBaseTraceHypo::GetlastTime()
+{
+	return this->lastTime;
+}
+
+const double CBaseTraceHypo::SetlastTime()
+{
+	return this->lastTime;
 }

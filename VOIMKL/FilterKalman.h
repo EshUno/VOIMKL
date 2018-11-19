@@ -33,18 +33,18 @@ public:
 	void update_F(double);
 	void update_U(double);
 
-	void Predict(CMeasurements firstMeasure, CMeasurements secondMeasure, mat &, colvec &);
-	colvec Predict(CBaseTraceHypo Trace, CMeasurements Measure, double);
+	void Predict(CMeasurements &firstMeasure, CMeasurements &secondMeasure, mat &, colvec &);
+	colvec Predict(CBaseTraceHypo &Trace, CMeasurements &Measure, double);
 
-	void UpdateMeasure(CBaseTraceHypo, CMeasurements);
-	void UpdatePredict(CBaseTraceHypo, double);
+	void UpdateMeasure(CBaseTraceHypo&, CMeasurements&);
+	void UpdatePredict(CBaseTraceHypo&, double);
 
 	void Prediction(double);
 	void Measurement(colvec new_z);
 	void Measurement();
 	void Update();
 	void UpdateEKF(const colvec &);
-
+	mat &GetS();
 protected:
 	//CKalmanFilter() {}
 
@@ -66,6 +66,7 @@ protected:
 	mat F; // Матрица перехода между состояниями.
 	mat U; // матрица Г
 	mat S; // Матрица обновления
+	
 	mat H; // Матрица наблюдения. Матрица отображающая отношение измерения и состояния
 	mat W; // Вессовая матрица. Матрица коэффициентов усиления.
 	mutable mat R; // Матрица шума измерения

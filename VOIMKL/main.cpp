@@ -101,13 +101,7 @@ int main(int argc, char** argv)
 //		F(row, col) = randu<mat>(2, 3);  // each element in field<mat> is a matrix
 //	}
 //	F.print("F:");
-
-
-
-
-	//¬енгерский алгоритм, который не работает дл€ пары из одинаковых наборов значений
-
-	vector< vector<double> > costMatrix(3, vector<double>(3, 0));
+	/*vector< vector<double> > costMatrix(3, vector<double>(3, 0));
 	costMatrix[0][0] = 10000;
 	costMatrix[0][1] = 4;
 	costMatrix[0][2] = 5;
@@ -133,27 +127,27 @@ int main(int argc, char** argv)
 	for (unsigned int x = 0; x < costMatrix.size(); x++)
 		std::cout << x << "," << assignment[x] << "\t";
 
-	std::cout << "\ncost: " << cost << std::endl;
+	std::cout << "\ncost: " << cost << std::endl;*/
 
-	/*CVOI *VOI = new CVOI;
-	VOI->SetSizeZone(0, 6000);
+	CVOI *voi = new CVOI;
+	voi->SetSizeZone(0, 6000);
 	CVector v1;
 	v1.x = 1000;
 	v1.y = 5000;
 	v1.z = 5000;
 	CResultOfScan r1(v1, 20, 0.0124);
-	VOI->pushMeasurements(r1);
-	VOI->pushSectorObserved(0.0200, 2000);
-	VOI->pushSectorObserved(0.0300, 4000);
-	VOI->pushSectorObserved(0.0450, 6000);
+	voi->pushMeasurements(r1);
+	voi->pushSectorObserved(0.0200, 2000);
+	voi->pushSectorObserved(0.0300, 4000);
+	voi->pushSectorObserved(0.0450, 6000);
 	v1.x = 1500;
 	v1.y = 4900;
 	v1.z = 5000;
 	CResultOfScan r2(v1, 20, 0.0500);
-	VOI->pushMeasurements(r2);
-	VOI->pushSectorObserved(0.0600, 2000);
-	VOI->pushSectorObserved(0.0700, 4000);
-	VOI->pushSectorObserved(0.0850, 6000);*/
+	voi->pushMeasurements(r2);
+	voi->pushSectorObserved(0.0600, 2000);
+	voi->pushSectorObserved(0.0700, 4000);
+	voi->pushSectorObserved(0.0850, 6000);
 	system("pause");
 	return 0;
 }
