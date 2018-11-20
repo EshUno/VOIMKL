@@ -24,7 +24,7 @@ public:
 	mat &SetP();
 	colvec &SetState_X();
 	mat &SetQ();
-	double GetlastTime();
+	double GetlastTime(double time);
 	const double SetlastTime();
 
 	//void UpdateState(mat P, colvec x); //для обновления по предсказаниям или измерениям

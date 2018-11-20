@@ -49,6 +49,7 @@ void CVOI::associate()
 				double dt = 0;//Узнать, что тут Кириллу нужно
 				KalmanFilter.Predict(BankOfSection[CurrentSector].SetBankTrace()[i], BankOfSection[CurrentSector].SetBankMeasurements()[assignment[i]], dt);
 				KalmanFilter.UpdateMeasure(BankOfSection[CurrentSector].SetBankTrace()[i], BankOfSection[CurrentSector].SetBankMeasurements()[assignment[i]]);
+				(BankOfSection[CurrentSector].SetBankTrace())[i].GetlastTime(BankOfSection[CurrentSector].GetBankMeasurements()[assignment[i]].detectionTime);
 				BankOfSection[CurrentSector].SetBankTrace()[i].NullNmiss();
 				BankOfSection[CurrentSector].SetBankMeasurements()[assignment[i]].SetReservedForUpdate();
 			}
@@ -88,6 +89,7 @@ void CVOI::associate()
 				double dt = 0;//Узнать, что тут Кириллу нужно
 				KalmanFilter.Predict(BankOfSection[CurrentSector].SetBankHypo()[i], BankOfSection[CurrentSector].SetBankMeasurements()[assignment[i]], dt);
 				KalmanFilter.UpdateMeasure(BankOfSection[CurrentSector].SetBankHypo()[i], BankOfSection[CurrentSector].SetBankMeasurements()[assignment[i]]);
+				BankOfSection[CurrentSector].SetBankHypo()[i].GetlastTime(BankOfSection[CurrentSector].GetBankMeasurements()[assignment[i]].detectionTime);
 				BankOfSection[CurrentSector].SetBankHypo()[i].IncApprove();
 				BankOfSection[CurrentSector].SetBankHypo()[i].NullNmiss();
 				BankOfSection[CurrentSector].SetBankMeasurements()[assignment[i]].SetReservedForUpdate();
@@ -111,7 +113,7 @@ void CVOI::associate()
 		{
 			for (int j = 0; j < size; j++)
 			{
-				if (i < j) //чтобы не сравнивать одинакове пары 
+				if (i < j) //чтобы не сравнивать одинаковые пары 
 				{
 					colvec v;
 					mat S; 
