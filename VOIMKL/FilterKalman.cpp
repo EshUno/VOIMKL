@@ -5,25 +5,26 @@
 CKalmanFilter::CKalmanFilter()
 {
 	//P_Const << 100 << 0 << 0 << 0 << 0 << 0 << 0 << 0 << 0 << endr
-	//	<< 0 << 100 << 0 << 0 << 0 << 0 << 0 << 0 << 0 << endr
-	//	<< 0 << 0 << 100 << 0 << 0 << 0 << 0 << 0 << 0 << endr
-	//	<< 0 << 0 << 0 << 100 << 0 << 0 << 0 << 0 << 0 << endr
-	//	<< 0 << 0 << 0 << 0 << 100 << 0 << 0 << 0 << 0 << endr
-	//	<< 0 << 0 << 0 << 0 << 0 << 100 << 0 << 0 << 0 << endr
-	//	<< 0 << 0 << 0 << 0 << 0 << 0 << 100 << 0 << 0 << endr
-	//	<< 0 << 0 << 0 << 0 << 0 << 0 << 0 << 100 << 0 << endr
-	//	<< 0 << 0 << 0 << 0 << 0 << 0 << 0 << 0 << 100 << endr;
+	//  << 0 << 100 << 0 << 0 << 0 << 0 << 0 << 0 << 0 << endr
+	//  << 0 << 0 << 100 << 0 << 0 << 0 << 0 << 0 << 0 << endr
+	//  << 0 << 0 << 0 << 100 << 0 << 0 << 0 << 0 << 0 << endr
+	//  << 0 << 0 << 0 << 0 << 100 << 0 << 0 << 0 << 0 << endr
+	//  << 0 << 0 << 0 << 0 << 0 << 100 << 0 << 0 << 0 << endr
+	//  << 0 << 0 << 0 << 0 << 0 << 0 << 100 << 0 << 0 << endr
+	//  << 0 << 0 << 0 << 0 << 0 << 0 << 0 << 100 << 0 << endr
+	//  << 0 << 0 << 0 << 0 << 0 << 0 << 0 << 0 << 100 << endr;
 
 	/*P_Const <<  10000, 0, 0, 0, 0, 0, 0, 0, 0,
-				0, 10000, 0, 0, 0, 0, 0, 0, 0,
-				0, 0, 10000, 0, 0, 0, 0, 0, 0,
-				0, 0, 0, 10000, 0, 0, 0, 0, 0,
-				0, 0, 0, 0, 10000, 0, 0, 0, 0,
-				0, 0, 0, 0, 0, 10000, 0, 0, 0,
-				0, 0, 0, 0, 0, 0, 10000, 0, 0,
-				0, 0, 0, 0, 0, 0, 0, 10000, 0,
-				0, 0, 0, 0, 0, 0, 0, 0, 10000;*/
+	0, 10000, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 10000, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 10000, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 10000, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 10000, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 10000, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 10000, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 10000;*/
 	//P_0.eye(n, n);
+	makeMatrix_H();
 
 
 }
@@ -74,7 +75,7 @@ void CKalmanFilter::Prediction(double dt)
 		this->x_pred = F * x_0;
 		//x_pred.print("X_pred:");
 	}
-	
+
 	this->P = F * P_Const * F.t() + U * Q * U.t();
 	//P.print("P:");
 	//this->P = F * P_0 * F.transpose() + U * Q * U.transpose();
@@ -83,16 +84,21 @@ void CKalmanFilter::Prediction(double dt)
 
 void CKalmanFilter::Predict(CMeasurements &firstMeasure, CMeasurements &secondMeasure, mat & S_VOI, colvec & v_VOI)
 {
+	double dt = abs(firstMeasure.detectionTime - secondMeasure.detectionTime);
+	update_F(dt);
+	update_U(dt);
+
 	P = F * P_Const * F.t() + U * Q * U.t();
 	mat R_Meas = firstMeasure.GetR() + secondMeasure.GetR();
 	S_VOI = R_Meas + H * P * H.t();
-//	v = firstMeasure.Coordinates - secondMeasure.Coordinates;
+	//  v = firstMeasure.Coordinates - secondMeasure.Coordinates;
 	v_VOI = firstMeasure.Setz() - secondMeasure.Setz();
 }
 
-colvec CKalmanFilter::Predict(CBaseTraceHypo &TraceOrHypo, CMeasurements &Measure, double dt)
+colvec  CKalmanFilter::Predict(CBaseTraceHypo & TraceOrHypo, CMeasurements & Measure)
 {
-	this->Dt = dt;
+	//this->Dt = dt;
+	double dt = abs(TraceOrHypo.SetlastTime() - Measure.detectionTime);
 	update_F(dt);
 	update_U(dt);
 
@@ -117,7 +123,7 @@ void CKalmanFilter::Measurement()
 	flag++;
 }
 
-void CKalmanFilter::Measurement(colvec new_z)
+void CKalmanFilter::Measurement(colvec & new_z)
 {
 	this->z = new_z;
 	//H.print("H:");
@@ -140,12 +146,13 @@ void CKalmanFilter::Update()
 	P = P - W * S * W.t();
 	//P.print("P:");
 	flag++;
-	cout <<"\n\nflag:" <<flag << endl;
+	cout << "\n\nflag:" << flag << endl;
 
 }
 
 void CKalmanFilter::UpdateMeasure(CBaseTraceHypo &TraceOrHypo, CMeasurements &measurement)
 {
+
 	v = measurement.Getz() - x_pred;
 	W = P * H.t() * S.t();
 	P = P - W * S * W.i();
@@ -182,8 +189,8 @@ colvec DecartToPolar(const colvec &c)
 
 void CKalmanFilter::UpdateEKF(const colvec &z)
 {
-	// написать функцию конвертации из декартовых координат в пол€рные координаты 
-	Measurement(z);
+	// написать функцию конвертации из декартовых координат в пол€рные координаты
+	//Measurement(z);
 
 	W = P * H.t() * S.i();
 	x_pred = x_pred + W * v;
@@ -198,79 +205,79 @@ void CKalmanFilter::makeMatrix_Q(mat G, double a)
 
 void CKalmanFilter::makeMatrix_R()
 {
-	this->R << 1 << 0 << 0 <<endr
-			<< 0 << 1 << 0 <<endr
-			<< 0 << 0 << 1 << endr;
+	this->R << 1 << 0 << 0 << endr
+		<< 0 << 1 << 0 << endr
+		<< 0 << 0 << 1 << endr;
 }
 
 void CKalmanFilter::makeMatrix_F()
 {
 	//this->F <<
-	//	1, 0, 0, Dt, 0, 0, Dt_squared, 0, 0,
-	//	0, 1, 0, 0, Dt, 0, 0, Dt_squared, 0,
-	//	0, 0, 1, 0, 0, Dt, 0, 0, Dt_squared,
-	//	0, 0, 0, 1, 0, 0, Dt, 0, 0,
-	//	0, 0, 0, 0, 1, 0, 0, Dt, 0,
-	//	0, 0, 0, 0, 0, 1, 0, 0, Dt,
-	//	0, 0, 0, 0, 0, 0, 1, 0, 0,
-	//	0, 0, 0, 0, 0, 0, 0, 1, 0,
-	//	0, 0, 0, 0, 0, 0, 0, 0, 1;
+	//  1, 0, 0, Dt, 0, 0, Dt_squared, 0, 0,
+	//  0, 1, 0, 0, Dt, 0, 0, Dt_squared, 0,
+	//  0, 0, 1, 0, 0, Dt, 0, 0, Dt_squared,
+	//  0, 0, 0, 1, 0, 0, Dt, 0, 0,
+	//  0, 0, 0, 0, 1, 0, 0, Dt, 0,
+	//  0, 0, 0, 0, 0, 1, 0, 0, Dt,
+	//  0, 0, 0, 0, 0, 0, 1, 0, 0,
+	//  0, 0, 0, 0, 0, 0, 0, 1, 0,
+	//  0, 0, 0, 0, 0, 0, 0, 0, 1;
 
 	/*this->F <<
-		1, Dt, Dt_squared, 0, 0, 0, 0, 0, 0,
-		0, 1, Dt, 0, 0, 0, 0, 0, 0,
-		0, 0, 1, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 1, Dt, Dt_squared, 0, 0, 0,
-		0, 0, 0, 0, 1, Dt, 0, 0, 0,
-		0, 0, 0, 0, 0, 1, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 1, Dt, Dt_squared,
-		0, 0, 0, 0, 0, 0, 0, 1, Dt,
-		0, 0, 0, 0, 0, 0, 0, 0, 1;*/
+	1, Dt, Dt_squared, 0, 0, 0, 0, 0, 0,
+	0, 1, Dt, 0, 0, 0, 0, 0, 0,
+	0, 0, 1, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 1, Dt, Dt_squared, 0, 0, 0,
+	0, 0, 0, 0, 1, Dt, 0, 0, 0,
+	0, 0, 0, 0, 0, 1, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 1, Dt, Dt_squared,
+	0, 0, 0, 0, 0, 0, 0, 1, Dt,
+	0, 0, 0, 0, 0, 0, 0, 0, 1;*/
 	this->F << 1 << Dt << Dt_squared << 0 << 0 << 0 << 0 << 0 << 0 << endr
-			<< 0 << 1 << Dt << 0 << 0 << 0 << 0 << 0 << 0 << endr
-			<< 0 << 0 << 1 << 0 << 0 << 0 << 0 << 0 << 0 << endr
-			<< 0 << 0 << 0 << 1 << Dt << Dt_squared << 0 << 0 << 0 << endr
-			<< 0 << 0 << 0 << 0 << 1 << Dt << 0 << 0 << 0 << endr
-			<< 0 << 0 << 0 << 0 << 0 << 1 << 0 << 0 << 0 << endr
-			<< 0 << 0 << 0 << 0 << 0 << 0 << 1 << Dt << Dt_squared << endr
-			<< 0 << 0 << 0 << 0 << 0 << 0 << 0 << 1 << Dt << endr
-			<< 0 << 0 << 0 << 0 << 0 << 0 << 0 << 0 << 1 << endr;
-}	
+		<< 0 << 1 << Dt << 0 << 0 << 0 << 0 << 0 << 0 << endr
+		<< 0 << 0 << 1 << 0 << 0 << 0 << 0 << 0 << 0 << endr
+		<< 0 << 0 << 0 << 1 << Dt << Dt_squared << 0 << 0 << 0 << endr
+		<< 0 << 0 << 0 << 0 << 1 << Dt << 0 << 0 << 0 << endr
+		<< 0 << 0 << 0 << 0 << 0 << 1 << 0 << 0 << 0 << endr
+		<< 0 << 0 << 0 << 0 << 0 << 0 << 1 << Dt << Dt_squared << endr
+		<< 0 << 0 << 0 << 0 << 0 << 0 << 0 << 1 << Dt << endr
+		<< 0 << 0 << 0 << 0 << 0 << 0 << 0 << 0 << 1 << endr;
+}
 
 void CKalmanFilter::update_F(double dt)
 {
 	double ddt = dt * dt;
 	this->Dt = dt;
-	this->Dt_squared = (dt * dt)/2;
+	this->Dt_squared = (dt * dt) / 2;
 
-	/*this->F << 
-		1, 0, 0, dt, 0, 0, ddt, 0, 0,
-		0, 1, 0, 0, dt, 0, 0, ddt, 0,
-		0, 0, 1, 0, 0, dt, 0, 0, ddt,
-		0, 0, 0, 1, 0, 0, dt, 0, 0,
-		0, 0, 0, 0, 1, 0, 0, dt, 0,
-		0, 0, 0, 0, 0, 1, 0, 0, dt,
-		0, 0, 0, 0, 0, 0, 1, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 1, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 1;*/
+	/*this->F <<
+	1, 0, 0, dt, 0, 0, ddt, 0, 0,
+	0, 1, 0, 0, dt, 0, 0, ddt, 0,
+	0, 0, 1, 0, 0, dt, 0, 0, ddt,
+	0, 0, 0, 1, 0, 0, dt, 0, 0,
+	0, 0, 0, 0, 1, 0, 0, dt, 0,
+	0, 0, 0, 0, 0, 1, 0, 0, dt,
+	0, 0, 0, 0, 0, 0, 1, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 1, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 1;*/
 
 	this->F << 1 << Dt << Dt_squared << 0 << 0 << 0 << 0 << 0 << 0 << endr
-			<< 0 << 1 << Dt << 0 << 0 << 0 << 0 << 0 << 0 << endr
-			<< 0 << 0 << 1 << 0 << 0 << 0 << 0 << 0 << 0 << endr
-			<< 0 << 0 << 0 << 1 << Dt << Dt_squared << 0 << 0 << 0 << endr
-			<< 0 << 0 << 0 << 0 << 1 << Dt << 0 << 0 << 0 << endr
-			<< 0 << 0 << 0 << 0 << 0 << 1 << 0 << 0 << 0 << endr
-			<< 0 << 0 << 0 << 0 << 0 << 0 << 1 << Dt << Dt_squared << endr
-			<< 0 << 0 << 0 << 0 << 0 << 0 << 0 << 1 << Dt << endr
-			<< 0 << 0 << 0 << 0 << 0 << 0 << 0 << 0 << 1 << endr;
+		<< 0 << 1 << Dt << 0 << 0 << 0 << 0 << 0 << 0 << endr
+		<< 0 << 0 << 1 << 0 << 0 << 0 << 0 << 0 << 0 << endr
+		<< 0 << 0 << 0 << 1 << Dt << Dt_squared << 0 << 0 << 0 << endr
+		<< 0 << 0 << 0 << 0 << 1 << Dt << 0 << 0 << 0 << endr
+		<< 0 << 0 << 0 << 0 << 0 << 1 << 0 << 0 << 0 << endr
+		<< 0 << 0 << 0 << 0 << 0 << 0 << 1 << Dt << Dt_squared << endr
+		<< 0 << 0 << 0 << 0 << 0 << 0 << 0 << 1 << Dt << endr
+		<< 0 << 0 << 0 << 0 << 0 << 0 << 0 << 0 << 1 << endr;
 
 }
 void CKalmanFilter::makeMatrix_H()
 {
 
 	this->H << 1 << 0 << 0 << 0 << 0 << 0 << 0 << 0 << 0 << endr
-			<< 0 << 0 << 0 << 1 << 0 << 0 << 0 << 0 << 0 << endr
-			<< 0 << 0 << 0 << 0 << 0 << 0 << 1 << 0 << 0 << endr;
+		<< 0 << 0 << 0 << 1 << 0 << 0 << 0 << 0 << 0 << endr
+		<< 0 << 0 << 0 << 0 << 0 << 0 << 1 << 0 << 0 << endr;
 }
 
 void CKalmanFilter::makeMatrix_Q()
@@ -280,7 +287,7 @@ void CKalmanFilter::makeMatrix_Q()
 
 //void CKalmanFilter::makeMatrix_Q()
 //{
-//	Q = U * Q_1 * U.t();
+//  Q = U * Q_1 * U.t();
 //}
 
 void CKalmanFilter::makeMatrix_U()
@@ -294,11 +301,11 @@ void CKalmanFilter::update_U(double dt)
 {
 	double dt_squared = (dt * dt) / 2;
 	//this->U << dt_squared, dt_squared, dt_squared, dt, dt, dt, 1, 1, 1;
-	this->U << dt_squared << endr << dt << endr << 1 << endr << dt_squared << endr 
+	this->U << dt_squared << endr << dt << endr << 1 << endr << dt_squared << endr
 		<< dt << endr << 1 << endr << dt_squared << endr << dt << endr << 1;
 }
 
-mat CKalmanFilter::getMatrix_P()
+mat & CKalmanFilter::getMatrix_P()
 {
 	return this->P;
 }
@@ -314,9 +321,14 @@ void CKalmanFilter::setMatrix_P(mat  new_P)
 	this->P = new_P;
 }
 
-colvec CKalmanFilter::getVector_x()
+colvec&  CKalmanFilter::getVector_x()
 {
 	return this->x_pred;
+}
+
+mat &CKalmanFilter::GetS()
+{
+	return this->S;
 }
 
 void CKalmanFilter::setDt(double Dt)
@@ -324,17 +336,18 @@ void CKalmanFilter::setDt(double Dt)
 	this->Dt = Dt;
 }
 
-
-mat &CKalmanFilter::GetS()
-{
-	return this->S;
-}
-
 void CKalmanFilter::print_coordinate()
 {
 	x_pred.print("X_PRED:");
 }
 
+//
+//mat & CKalmanFilter::GetS()
+//{
+//	return this->S;
+//}
 
-
-
+//void CKalmanFilter::print_coordinate()
+//{
+//	x_pred.print("X_PRED:");
+//}

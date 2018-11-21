@@ -34,7 +34,7 @@ void CVOI::associate()
 			{
 				
 				double dt = 0;//Узнать, что тут Кириллу нужно
-				colvec v = KalmanFilter.Predict(BankOfSection[CurrentSector].SetBankTrace()[i], BankOfSection[CurrentSector].SetBankMeasurements()[j], dt);
+				colvec v = KalmanFilter.Predict(BankOfSection[CurrentSector].SetBankTrace()[i], BankOfSection[CurrentSector].SetBankMeasurements()[j]);
 				double D = countNorma(v, KalmanFilter.GetS());
 				if (D <= constSimilarityRate) MatrixSet[i][j] = D;
 				else MatrixSet[i][j] = constBigNumber;
@@ -47,7 +47,7 @@ void CVOI::associate()
 			if ((assignment[i] != -1) && (MatrixSet[i][assignment[i]] != constBigNumber)) //венгерский алгоритм в любом случае найдет в каждой строке по числу, если кол-во столбцов позволяет,  -1 оно возвращает когда столбцов меньше строк
 			{
 				double dt = 0;//Узнать, что тут Кириллу нужно
-				KalmanFilter.Predict(BankOfSection[CurrentSector].SetBankTrace()[i], BankOfSection[CurrentSector].SetBankMeasurements()[assignment[i]], dt);
+				KalmanFilter.Predict(BankOfSection[CurrentSector].SetBankTrace()[i], BankOfSection[CurrentSector].SetBankMeasurements()[assignment[i]]);
 				KalmanFilter.UpdateMeasure(BankOfSection[CurrentSector].SetBankTrace()[i], BankOfSection[CurrentSector].SetBankMeasurements()[assignment[i]]);
 				(BankOfSection[CurrentSector].SetBankTrace())[i].GetlastTime(BankOfSection[CurrentSector].GetBankMeasurements()[assignment[i]].detectionTime);
 				BankOfSection[CurrentSector].SetBankTrace()[i].NullNmiss();
@@ -56,7 +56,7 @@ void CVOI::associate()
 			else
 			{
 				double dt = 0;//Узнать, что тут Кириллу нужно
-				KalmanFilter.Predict(BankOfSection[CurrentSector].SetBankTrace()[i], BankOfSection[CurrentSector].SetBankMeasurements()[assignment[i]], dt);
+				KalmanFilter.Predict(BankOfSection[CurrentSector].SetBankTrace()[i], BankOfSection[CurrentSector].SetBankMeasurements()[assignment[i]]);
 				KalmanFilter.UpdatePredict(BankOfSection[CurrentSector].SetBankTrace()[i], dt);
 				BankOfSection[CurrentSector].SetBankTrace()[i].IncNmiss();
 			}
@@ -74,7 +74,7 @@ void CVOI::associate()
 			for (int j = 0; j < sizeCol; j++)
 			{
 				double dt = 0;//Узнать, что тут Кириллу нужно
-				colvec v=KalmanFilter.Predict(BankOfSection[CurrentSector].SetBankHypo()[i], BankOfSection[CurrentSector].SetBankMeasurements()[j], dt);
+				colvec v=KalmanFilter.Predict(BankOfSection[CurrentSector].SetBankHypo()[i], BankOfSection[CurrentSector].SetBankMeasurements()[j]);
 				double D = countNorma(v, KalmanFilter.GetS());
 				if (D <= constSimilarityRate) MatrixSet[i][j] = D;
 				else MatrixSet[i][j] = constBigNumber;
@@ -87,7 +87,7 @@ void CVOI::associate()
 			if ((assignment[i] != -1) && (MatrixSet[i][assignment[i]] != constBigNumber)) //венгерский алгоритм в любом случае найдет в каждой строке по числу, если кол-во столбцов позволяет,  -1 оно возвращает когда столбцов меньше строк
 			{
 				double dt = 0;//Узнать, что тут Кириллу нужно
-				KalmanFilter.Predict(BankOfSection[CurrentSector].SetBankHypo()[i], BankOfSection[CurrentSector].SetBankMeasurements()[assignment[i]], dt);
+				KalmanFilter.Predict(BankOfSection[CurrentSector].SetBankHypo()[i], BankOfSection[CurrentSector].SetBankMeasurements()[assignment[i]]);
 				KalmanFilter.UpdateMeasure(BankOfSection[CurrentSector].SetBankHypo()[i], BankOfSection[CurrentSector].SetBankMeasurements()[assignment[i]]);
 				BankOfSection[CurrentSector].SetBankHypo()[i].GetlastTime(BankOfSection[CurrentSector].GetBankMeasurements()[assignment[i]].detectionTime);
 				BankOfSection[CurrentSector].SetBankHypo()[i].IncApprove();
@@ -97,7 +97,7 @@ void CVOI::associate()
 			else
 			{
 				double dt = 0;//Узнать, что тут Кириллу нужно
-				KalmanFilter.Predict(BankOfSection[CurrentSector].SetBankHypo()[i], BankOfSection[CurrentSector].SetBankMeasurements()[assignment[i]], dt);
+				KalmanFilter.Predict(BankOfSection[CurrentSector].SetBankHypo()[i], BankOfSection[CurrentSector].SetBankMeasurements()[assignment[i]]);
 				KalmanFilter.UpdatePredict(BankOfSection[CurrentSector].SetBankHypo()[i], dt);
 				BankOfSection[CurrentSector].SetBankHypo()[i].IncNmiss();
 				BankOfSection[CurrentSector].SetBankHypo()[i].NullNapprove();
